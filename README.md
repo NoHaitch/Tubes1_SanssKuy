@@ -15,9 +15,9 @@
     <!-- <img src="" alt="Project Logo // Team Picture // etc">
     <br/>
     <br/> -->
-    <a href="#">Report Bug</a>
+    <a href="https://github.com/NoHaitch/Tubes1_SanssKuy/issues">Report Bug</a>
     ·
-    <a href="#">Request Feature</a>
+    <a href="https://github.com/NoHaitch/Tubes1_SanssKuy/issues">Request Feature</a>
 <br>
 <br>
 
