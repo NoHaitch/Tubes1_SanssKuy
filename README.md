@@ -37,13 +37,19 @@
         <td>NIM</td>
         <td>Name</td>
       </tr>
-      <tr>
-        <td>13522105</td>
-        <td>Fabian Radenta Bangun</td>
       </tr>
       <tr>
         <td>13522091</td>
         <td>Raden Francisco Trianto Bratadiningrat</td>
+      </tr>
+      <tr>
+        <td>13522105</td>
+        <td>Fabian Radenta Bangun</td>
+      </tr>
+      </tr>
+      <tr>
+        <td>13522132</td>
+        <td>Hafizh Hananta Akbari</td>
       </tr>
     </table>
   </strong>
