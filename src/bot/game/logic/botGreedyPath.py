@@ -31,6 +31,13 @@ class BotGreedyPath(BaseLogic):
     def getBlueDiamonds(self, board: Board) -> list[GameObject]: return [diamond for diamond in board.diamonds if diamond.properties.points == 1]
     
     def getPortals(self, board: Board) -> list[GameObject]: return [home for home in board.game_objects if home.type=="TeleportGameObject"]
+    def getSortedPortals(self, this_bot: GameObject, board: Board) -> list[GameObject]: 
+        # Sort portals based on distance to bot
+        portals = self.getPortals(board)
+        if(self.distanceWithoutPortal(this_bot, portals[0]) < self.distanceWithoutPortal(this_bot, portals[1])):
+            return portals[0], portals[1]
+        else:
+            return portals[1], portals[0]
     def getDiamondButton(self, board: Board) -> GameObject: return [home for home in board.game_objects if home.type=="DiamondButtonGameObject"][0]
 
     def getClosestRedDiamond(self, this_bot: GameObject, board: Board) -> GameObject:
@@ -54,22 +61,16 @@ class BotGreedyPath(BaseLogic):
             return None
         return min(enemies, key=lambda enemies: self.distance(this_bot, enemies, board))
 
-    def getSortedPortals(self, board_bot: GameObject, board: Board) -> list[GameObject]: 
-        # Sort portals based on distance to bot
-        portals = self.getPortals(board)
-        if(self.distanceWithoutPortal(board_bot, portals[0]) < self.distanceWithoutPortal(board_bot, portals[1])):
-            return portals[0], portals[1]
-        else:
-            return portals[1], portals[0]
-
-    def getUsedInventorySpace(self, board_bot:GameObject) -> int: return board_bot.properties.diamonds
-    def getEmptyInventorySpace(self, board_bot:GameObject) -> int: return board_bot.properties.inventory_size - board_bot.properties.diamonds
+    def getUsedInventorySpace(self, this_bot:GameObject) -> int: return this_bot.properties.diamonds
+    def getEmptyInventorySpace(self, this_bot:GameObject) -> int: return this_bot.properties.inventory_size - this_bot.properties.diamonds
     
+    def getTimeRemaining(self, this_bot:GameObject) -> int: return this_bot.properties.milliseconds_left 
+
     # ==================== Checks ==================== #
     def isInventoryFull(self, this_bot: GameObject) -> bool: return this_bot.properties.diamonds == this_bot.properties.inventory_size
     def isInventoryEmpty(self, this_bot: GameObject) -> bool: return this_bot.properties.diamonds == 0
 
-    # ===== Distance ====== #
+    # ==================== Distance ===================== #
     def distance(self, objectFrom: GameObject, objectTo: GameObject, board: Board) -> int: return min(self.distanceWithoutPortal(objectFrom, objectTo), self.distanceUsingPortal(objectFrom, objectTo, board))
     def distanceWithoutPortal(self, objectFrom: GameObject, objectTo: GameObject) -> int: return abs(objectFrom.position.y - objectTo.position.y) + abs(objectFrom.position.x - objectTo.position.x)
     def distanceUsingPortal(self, objectFrom: GameObject, objectTo: GameObject, board: Board) -> int:
@@ -82,28 +83,29 @@ class BotGreedyPath(BaseLogic):
         return self.distance(this_bot, self.getClosestEnemy(this_bot, board), board)
     def getBaseDistance(self, this_bot: GameObject, board: Board) -> int: return self.distance(this_bot, self.getHomeBaseObject(this_bot, board), board)
 
-    # ===== Movement ===== #
+    # ==================== Movement ==================== #
     def moveRight(self): return (1,0)
     def moveLeft(self): return (-1,0)
     def moveUp(self): return (0,1)
     def moveDown(self): return (0,-1)
-    def moveToObjective(self, board_bot: GameObject, objective: GameObject, board: Board):
-        x_diff:int = board_bot.position.x - objective.position.x
-        y_diff:int = board_bot.position.y - objective.position.y
 
-        if objective.type=="TeleportGameObject" and self.distance(board_bot, self.getHomeBaseObject(board_bot, board), board) == 0:
+    def moveToObjective(self, this_bot: GameObject, objective: GameObject, board: Board):
+        x_diff:int = this_bot.position.x - objective.position.x
+        y_diff:int = this_bot.position.y - objective.position.y
+
+        if objective.type=="TeleportGameObject" and self.distance(this_bot, self.getHomeBaseObject(this_bot, board), board) == 0:
             temp = randint(1,4)
             if temp == 1:
-                return self.moveUp(board_bot, board)
+                return self.moveUp(this_bot, board)
             elif temp == 2:
-                return self.moveDown(board_bot, board)
+                return self.moveDown(this_bot, board)
             elif temp == 3:
-                return self.moveLeft(board_bot, board)
+                return self.moveLeft(this_bot, board)
             else:
-                return self.moveRight(board_bot, board)
+                return self.moveRight(this_bot, board)
 
-        if objective.type!="TeleportGameObject" and self.distance(board_bot, self.getHomeBaseObject(board_bot, board), board) > self.distanceUsingPortal(board_bot, self.getHomeBaseObject(board_bot, board), board):
-            return self.moveToObjective(board_bot, self.getSortedPortals(board_bot, board)[0], board)
+        if objective.type!="TeleportGameObject" and self.distance(this_bot, self.getHomeBaseObject(this_bot, board), board) > self.distanceUsingPortal(this_bot, self.getHomeBaseObject(this_bot, board), board):
+            return self.moveToObjective(this_bot, self.getSortedPortals(this_bot, board)[0], board)
 
         if(self.stepVariation % 2 == 0):
             self.stepVariation += 1
@@ -119,32 +121,37 @@ class BotGreedyPath(BaseLogic):
             elif x_diff > 0: return self.moveLeft()
                 
         return None
-    
-    def moveToBase(self, board_bot: GameObject, board: Board):
-        if self.distanceWithoutPortal(board_bot, self.getHomeBaseObject(board_bot, board)) > self.distanceUsingPortal(board_bot, self.getHomeBaseObject(board_bot, board), board):
-            return self.moveToObjective(board_bot, self.getSortedPortals(board_bot, board)[0], board)
-        return self.moveToObjective(board_bot, self.getHomeBaseObject(board_bot, board), board)
-    def movetoClosestEnemy(self, board_bot: GameObject, board: Board): return self.moveToObjective(board_bot, self.getClosestEnemy(board_bot, board), board)
+    def moveToBase(self, this_bot: GameObject, board: Board):
+        if self.distanceWithoutPortal(this_bot, self.getHomeBaseObject(this_bot, board)) > self.distanceUsingPortal(this_bot, self.getHomeBaseObject(this_bot, board), board):
+            return self.moveToObjective(this_bot, self.getSortedPortals(this_bot, board)[0], board)
+        return self.moveToObjective(this_bot, self.getHomeBaseObject(this_bot, board), board)
+    def movetoClosestEnemy(self, this_bot: GameObject, board: Board): return self.moveToObjective(this_bot, self.getClosestEnemy(this_bot, board), board)
     
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #
     # ==================== MAIN FUNCTION ==================== 
     # CURRENT ALGORITHM :
-    #   1 Check for near Enemy        (incase of attacking)
-    #   2 Check inventory full        (if full then go home)
-    #   3 If inventory is half full but the base is near, deposit the points
-    #   4 Go to the diamond that is within 2 moves and have sufficient inventory
-    #   5 Go to nearest diamond if inventory space is more than equal 2 
-    #   6 Go to blue diamond if sufficient inventory and distance is within 2 moves
-    #   7 If no diamonds found, and inventory is not empty, go to base
-    #   8 If no diamonds found, with empty inventory, go to diamond button
+    #   1 If timeleft is less than the distance to home, then go home
+    #   2 Check for near Enemy        (incase of attacking)
+    #   3 Check inventory full        (if full then go home)
+    #   4 If inventory is half full but the base is near, deposit the points
+    #   5 Go to the diamond that is within 2 moves and have sufficient inventory
+    #   6 Go to nearest diamond if inventory space is more than equal 2 
+    #   7 Go to blue diamond if sufficient inventory and distance is within 2 moves
+    #   8 If no diamonds found, and inventory is not empty, go to base
+    #   9 If no diamonds found, with empty inventory, go to diamond button
     #
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     
     def next_move(self, this_bot: GameObject, board: Board):
     # BOT FUNCTION CALL BY ENGINE
 
-    # 1 Check for near Enemy 
+    # 1 If timeleft is less than the distance to home, then go home
+        if not self.isInventoryEmpty(this_bot) and (self.getTimeRemaining(this_bot) // 1000) + 4 <= self.getBaseDistance(this_bot, board):
+            print("LOW TIME - GOING HOME")
+            return self.moveToBase(this_bot, board)
+
+    # 2 Check for near Enemy 
         if self.getClosestEnemyDistance(this_bot, board) == 1 and self.stepChaseEnemy <= 2:
             print("Attack Close Enemy.")
             self.stepChaseEnemy += 1
@@ -154,16 +161,16 @@ class BotGreedyPath(BaseLogic):
         elif self.stepChaseEnemy < 2:
             self.stepChaseEnemy += 1
 
-    # 2 Check inventory full    
+    # 3 Check inventory full    
         if self.isInventoryFull(this_bot):
             # print("Inventory Full.")
             return self.moveToBase(this_bot, board)
 
-    # 3 If inventory is half full but the base is near, deposit the points
+    # 4 If inventory is half full but the base is near, deposit the points
         if self.getBaseDistance(this_bot, board) <= 2 and self.getUsedInventorySpace(this_bot) >= 3:
             return self.moveToBase(this_bot, board)
 
-    # 4 Go to the diamond that is within 2 moves and have sufficient inventory
+    # 5 Go to the diamond that is within 2 moves and have sufficient inventory
         closest_diamond:GameObject = self.getClosestDiamond(this_bot, board)
         if closest_diamond:
             diamond_distance = self.distance(this_bot, closest_diamond, board)
@@ -171,25 +178,27 @@ class BotGreedyPath(BaseLogic):
                 # print("Going to Diamond Button.")
                 return self.moveToObjective(this_bot, self.getDiamondButton(board), board)
         
-    # 5 Go to nearest diamond if inventory space is more than equal 2   
+    # 6 Go to nearest diamond if inventory space is more than equal 2   
         if closest_diamond and self.getEmptyInventorySpace(this_bot) >= 2:
             # print(f"Going to Diamond. Location : {closest_diamond.position}")
             return self.moveToObjective(this_bot, closest_diamond, board) 
             
-    # 6 Go to blue diamond if sufficient inventory and distance is within 2 moves
+    # 7 Go to blue diamond if sufficient inventory and distance is within 2 moves
         closest_diamond = self.getClosestBlueDiamond(this_bot, board)
         if closest_diamond and self.getEmptyInventorySpace(this_bot) == 1 and closest_diamond.properties.points == 1 and diamond_distance <= 2:
             # print(f"Going to Diamond. Location : {closest_diamond.position}")
             return self.moveToObjective(this_bot, closest_diamond, board) 
 
-    # 7 If no diamonds found, and inventory is not empty, go to base
+    # 8 If no diamonds found, and inventory is not empty, go to base
         if(not self.isInventoryEmpty(this_bot)):
             # print("Emptying Inventory.")
             return self.moveToBase(this_bot, board)
         
-    # 8 If no diamonds, with empty inventory, go to diamond button
+    # 9 If no diamonds, with empty inventory, go to diamond button
         # print("Going to Diamond Button.")
         return self.moveToObjective(this_bot, self.getDiamondButton(board), board)
+
+        
 
     # TEMP
         temp = randint(1,4)
@@ -201,4 +210,5 @@ class BotGreedyPath(BaseLogic):
             return self.moveLeft(this_bot, board)
         else:
             return self.moveRight(this_bot, board)
+            
         
