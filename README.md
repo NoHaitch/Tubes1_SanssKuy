@@ -54,8 +54,9 @@
     </table>
   </strong>
   <br>
+  <h3> NOTE: Our team Main Bot is BotGreedyPath</h3>
+  <br>
 </div>
-
 
 
 <!-- TABLE OF CONTENTS -->
@@ -73,11 +74,12 @@
         <li><a href="#instruction">Instruction</a></li>
         <li>
         <details>
-          <summary><a href="#features">Features</a></summary>
+          <summary><a href="#features-bots">Features</a></summary>
           <ol>
-            <li><a href="#1-feature-x">Features - 1</a></li>
-            <li><a href="#2-feature-y">Features - 2</a></li>
-            <li><a href="#3-feature-z">Features - 3</a></li>
+            <li><a href="#1-greedy-by-path-main-bot">Greedy by Path (MAIN BOT)</a></li>
+            <li><a href="#2-greedy-by-points">Greedy By Points</a></li>
+            <li><a href="#3-chase-enemy">Chase Enemy</a></li>
+            <li><a href="#4-chase-enemy">Random Logic</a></li>
           <ol>
         </details>
         </li>
@@ -120,15 +122,12 @@ You can explore more on this link ...
 ### Prerequisites
 
 Project dependencies  
-example :  
 
-* Make 
-  ```sh
-  # in Linux
-  sudo apt install make
-  ```
 * Python
   ```sh
+  # in Windows
+  https://www.python.org/downloads/
+
   # in Linux
   sudo apt install python3
   ```
@@ -137,52 +136,53 @@ example :
 
 ### Installation
 
-_How to install and use your project_
+For installing and running the game engine please see [Get Started with Diamonds](https://docs.google.com/document/d/1L92Axb89yIkom0b24D350Z1QAr8rujvHof7-kXRAp7c/edit)  
+This are the steps to run and use the bots.   
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/NoHaitch/Repository_Template
+   git clone https://github.com/NoHaitch/Tubes1_SanssKuy
    ```
-2. Change the content
+2. Change directory
+   ```sh
+   cd src/bot
+   ```
+3. Run a Bot
+   ```sh
+   # format
+   python main.py --logic <BotClassName> --email=<Email> --name=<BotName>  --password=<Password> --team etimo
 
+   # example
+   python main.py --logic BotGreedyPath --email=test6@email.com --name=main --password=123456 --team etimo
+   ```
+
+  - `BotClassName` : class name of the bot you want, currently option are Random, BotGreedyPoints, BotGreedyPath, and BotChase  
+  - `Email` : email bust be in valid format (ex: your_email@example.com), each bot must have a unique email  
+  - `BotName` : bot name must be unique and limited to 10 characters  
+    &nbsp;
+   
+4. Run multiple Bots
+   ```sh
+   # in Windows
+   ./run-bots.bat
+
+   # in Linux
+   ./run-bots.sh
+   ```
+
+
+For further information please refer to [Get Started with Diamonds](https://docs.google.com/document/d/1L92Axb89yIkom0b24D350Z1QAr8rujvHof7-kXRAp7c/edit) 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- INSTURCTION -->
-## Instruction
-Instruction to run/build/etc the program  
-example: 
 
-`make build` : To build from source to binary into bin/main  
-`make all` : Run binary directly after building   
-`make clean` : Remove all build generated files  
-`make ADT.test` : Running test for ADT test file, for example ( `make time.test` )  
-`make test.all` : Running all test  
+<!-- Bots -->
+## Features (Bots)
 
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- FEATURES -->
-## Features
-
-### 1. Feature X
-
-this feature does X
-
-### 2. Feature Y
-
-this feature does Y  
-sub-features:
-   1. function 1
-   2. function 2
-   3. function 3
-
-### 3. Feature Z
-
-this feature does Z
-- `A`: print A.  
-- `B`: print B.  
-- `C`: print C.
+### 1. Greedy by Path (MAIN BOT)
+### 2. Greedy By Points
+### 3. Chase Enemy
+### 4. Random Logic
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
