@@ -108,7 +108,7 @@ A greedy Algorithm, in a short explanation, is taking the best move in the curre
   
 Our Bot uses a greedy algorithm mainly based on greedy by path. Currently, our Algorithm in priority are:   
 1. If the time left is less than the distance to the base, then the bot will go to the base    
-2. If the Enemy is within one move, then the bot will attack it    
+2. If the Enemy is within one move, then the bot will attack it, unless the enemy is in it's base    
 3. If the bot's inventory is full, it will go to the base to deposit the diamonds  
 4. If the bot's inventory is half full but the base is near, deposit the diamonds    
 5. Go to the nearest diamond if inventory space is more than equal to 2   
