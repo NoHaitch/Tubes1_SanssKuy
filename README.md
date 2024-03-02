@@ -71,7 +71,6 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
-        <li><a href="#instruction">Instruction</a></li>
         <li>
         <details>
           <summary><a href="#features-bots">Features</a></summary>
@@ -103,7 +102,19 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-General Explanation about the project, Why you made this, What does it do exactly.  
+For Tugas Besar 1 (Big Task 1), we are to make a bot for diamonds using a greedy algorithm. The Bot will be competing with other teams' bots in a competition. 
+
+A greedy Algorithm, in a short explanation, is taking the best move in the current position without thinking that there is a better solution in the future by not taking the best move.
+  
+Our Bot uses a greedy algorithm mainly based on greedy by path. Currently, our Algorithm in priority are:   
+1. If the time left is less than the distance to the base, then the bot will go to the base    
+2. If the Enemy is within one move, then the bot will attack it    
+3. If the bot's inventory is full, it will go to the base to deposit the diamonds  
+4. If the bot's inventory is half full but the base is near, deposit the diamonds    
+5. Go to the nearest diamond if inventory space is more than equal to 2   
+6. Go to the nearest blue diamond that is within 2 moves, if the bot's inventory is not full  
+7. If no diamonds are found, and the bot's inventory is not empty, then it will go to the base  
+8. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button  
 
 <!-- OPTIONAL LINK OR REFERENCE -->
 <!-- <p align="center">
