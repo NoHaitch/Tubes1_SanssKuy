@@ -54,8 +54,6 @@
     </table>
   </strong>
   <br>
-  <h3> NOTE: Our team Main Bot is BotGreedyPath</h3>
-  <br>
 </div>
 
 
@@ -72,16 +70,7 @@
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
         <li>
-        <details>
-          <summary><a href="#features-bots">Features</a></summary>
-          <ol>
-            <li><a href="#1-greedy-by-path-main-bot">Greedy by Path (MAIN BOT)</a></li>
-            <li><a href="#2-greedy-by-points">Greedy By Points</a></li>
-            <li><a href="#3-chase-enemy">Chase Enemy</a></li>
-            <li><a href="#4-chase-enemy">Random Logic</a></li>
-          <ol>
-        </details>
-        </li>
+        <li><a href="#features-bots">Features</a></li>
       </ul>
     </li>
     <li><a href="#contributing">Contributing</a></li>
@@ -96,6 +85,7 @@
 - [Bot Starter Pack](https://github.com/haziqam/tubes1-IF2211-bot-starter-pack/releases/tag/v1.0.1)
 - [Spesifikasi](https://docs.google.com/document/d/13cbmMVXviyu8eKQ6heqgDzt4JNNMeAZO/edit)
 - [Teams](https://docs.google.com/spreadsheets/d/1ZILn6qF6UQxNtX9gTAW3OLUATywvMxiH6ZWjcOHQIMk/edit#gid=0)
+- [Laporan](https://docs.google.com/document/d/1PFvT0fZ5A-Y0c4bGGskhrANSyCaK5hDHjAJZVX32QWw/edit#heading=h.ikd424rh8bpn)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -190,10 +180,12 @@ For further information please refer to [Get Started with Diamonds](https://docs
 <!-- Bots -->
 ## Features (Bots)
 
-### 1. Greedy by Path (MAIN BOT)
-### 2. Greedy By Points
-### 3. Chase Enemy
-### 4. Random Logic
+### Greedy by Path (MAIN BOT)
+#### Other bots made:
+- Greedy By Points
+- Chase Enemy
+- Random Logic
+- Stay at Base
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
