@@ -9,7 +9,7 @@ from random import randint
 # - Portal : TeleportGameObject
 # - Diamond Button : DiamondButtonGameObject 
 
-class BotGreedyPath(BaseLogic):
+class MyBot(BaseLogic):
     def __init__(self):
         self.step_variation : bool = False
         self.step_ignore_portal : int = 0
@@ -29,6 +29,7 @@ class BotGreedyPath(BaseLogic):
         self.objects_button : list[GameObject] = []
         self.red_diamonds : list[GameObject] = []
         self.blue_diamonds : list[GameObject] = []
+        self.closest_enemy : GameObject = None
 
     # ==================== GETTER ==================== #
     def getGameObjects(self, board: Board) -> None:
@@ -120,6 +121,7 @@ class BotGreedyPath(BaseLogic):
     # ==================== Checks ==================== #
     def isInventoryFull(self) -> bool: return self.current_inventory_space == 0
     def isInventoryEmpty(self, this_bot: GameObject) -> bool: return self.current_inventory_space == this_bot.properties.inventory_size
+    def isBotHome(self, this_bot: GameObject) -> bool: return 
 
     # ==================== Distance ===================== #
     def distance(self, objectFrom: GameObject, objectTo: GameObject, board: Board) -> int: 
@@ -130,10 +132,9 @@ class BotGreedyPath(BaseLogic):
     def distanceUsingPortal(self, objectFrom: GameObject, objectTo: GameObject, board: Board) -> int:
         return self.distanceWithoutPortal(objectFrom, self.sorted_portals[0]) + self.distanceWithoutPortal(self.sorted_portals[1], objectTo)
     def distanceToClosestEnemy(self, this_bot: GameObject, board: Board) -> int: 
-        enemy = self.getClosestEnemy(this_bot, board)
-        if not enemy:
+        if not self.closest_enemy:
             return None
-        return self.distance(this_bot, self.getClosestEnemy(this_bot, board), board)
+        return self.distance(this_bot, self.closest_enemy, board)
     def distanceToBase(self, this_bot: GameObject, board: Board) -> int: return self.distance(this_bot, self.base, board)
 
     # ==================== Movement ==================== #
@@ -252,13 +253,13 @@ class BotGreedyPath(BaseLogic):
 
 
     # 1. If the time left is less than the distance to the base, then the bot will go to the base    
-        if not self.isInventoryEmpty(this_bot) and self.getTimeRemaining(this_bot) - 2 <= self.current_distance_to_base:
+        if not self.isInventoryEmpty(this_bot) and self.getTimeRemaining(this_bot) - 2 <= self.current_distance_to_base and self.isBotHome(self.closest_enemy):
             # print("LOW TIME - GOING HOME")
             return self.moveToBase(this_bot, board)
 
     # 2. If the Enemy is within one move, then the bot will attack it, unless the enemy is in it's base    
-        # TODO dont attack if enemy is it's base
-        if self.distanceToClosestEnemy(this_bot, board) == 1 and self.step_chase_enemy <= 2 :
+        self.closest_enemy = self.getClosestEnemy(this_bot, board)
+        if self.distanceToClosestEnemy(this_bot, board) == 1 and self.step_chase_enemy:
             # print("Attack Close Enemy.")
             self.step_chase_enemy += 1
             return self.moveToClosestEnemy(this_bot, board) 
