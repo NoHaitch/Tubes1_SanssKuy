@@ -3,4 +3,4 @@ from game.models import Board, GameObject
 
 class Stay(BaseLogic):
     def next_move(self, this_bot: GameObject, board: Board):
-        return None
+        return (0, 0)
