@@ -138,12 +138,12 @@ class MyBot(BaseLogic):
     def distanceToBase(self, this_bot: GameObject, board: Board) -> int: return self.distance(this_bot, self.base, board)
 
     # ==================== Movement ==================== #
-    def moveRight(self): return (1,0)
-    def moveLeft(self): return (-1,0)
-    def moveUp(self): return (0,1)
-    def moveDown(self): return (0,-1)
+    def moveRight(self) -> tuple[int, int] : return (1,0)
+    def moveLeft(self) -> tuple[int, int] : return (-1,0)
+    def moveUp(self) -> tuple[int, int] : return (0,1)
+    def moveDown(self) -> tuple[int, int] : return (0,-1)
 
-    def moveToObjective(self, this_bot: GameObject, objective: GameObject, board: Board):
+    def moveToObjective(self, this_bot: GameObject, objective: GameObject, board: Board) -> tuple[int, int]:
         x_diff:int = this_bot.position.x - objective.position.x
         y_diff:int = this_bot.position.y - objective.position.y
 
@@ -214,12 +214,12 @@ class MyBot(BaseLogic):
         return None
     
     # ===== Move to Object ===== #
-    def moveToBase(self, this_bot: GameObject, board: Board):
+    def moveToBase(self, this_bot: GameObject, board: Board) -> tuple[int, int]:
         if self.distanceWithoutPortal(this_bot, self.base) > self.distanceUsingPortal(this_bot, self.base, board):
             return self.moveToObjective(this_bot, self.sorted_portals[0], board)
         return self.moveToObjective(this_bot, self.base, board)
-    def moveToClosestEnemy(self, this_bot: GameObject, board: Board): return self.moveToObjective(this_bot, self.getClosestEnemy(this_bot, board), board)
-    def moveToDiamondButton(self, this_bot: GameObject, board: Board): return self.moveToObjective(this_bot, self.getDiamondButton(), board)
+    def moveToClosestEnemy(self, this_bot: GameObject, board: Board) -> tuple[int, int]: return self.moveToObjective(this_bot, self.getClosestEnemy(this_bot, board), board)
+    def moveToDiamondButton(self, this_bot: GameObject, board: Board) -> tuple[int, int]: return self.moveToObjective(this_bot, self.getDiamondButton(), board)
 
 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -230,14 +230,15 @@ class MyBot(BaseLogic):
     #   2. If the Enemy is within one move, then the bot will attack it, unless the enemy is in it's base     
     #   3. If the bot's inventory is full, it will go to the base to deposit the diamonds  
     #   4. If the bot's inventory is half full but the base is near, deposit the diamonds    
-    #   5. Go to the nearest diamond if inventory space is more than equal to 2   
-    #   6. Go to the nearest blue diamond that is within 2 moves, if the bot's inventory is not full  
-    #   7. If no diamonds are found, and the bot's inventory is not empty, then it will go to the base  
-    #   8. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button  
+    #   5. If closest diamond distance is further than button, go to button
+    #   6. Go to the nearest diamond if inventory space is more than equal to 2   
+    #   7. Go to the nearest blue diamond that is within 2 moves, if the bot's inventory is not full  
+    #   8. If no diamonds are found, and the bot's inventory is not empty, then it will go to the base  
+    #   9. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button  
     #
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     
-    def next_move(self, this_bot: GameObject, board: Board):
+    def next_move(self, this_bot: GameObject, board: Board ) -> tuple[int, int]:
     # BOT FUNCTION CALL BY ENGINE
         # Update dynamic var
         self.getGameObjects()
@@ -277,25 +278,30 @@ class MyBot(BaseLogic):
     # 4. If the bot's inventory is half full but the base is near, deposit the diamonds    
         if self.current_distance_to_base <= 2 and self.current_inventory_space <= (this_bot.properties.inventory_size // 2):
             return self.moveToBase(this_bot, board)
-
-    # 5. Go to the nearest diamond if inventory space is more than equal to 2   
+    
+    # 5. If closest diamond distance is further than button, go to button
         closest_diamond = self.getClosestDiamond(this_bot, board)
+        closest_diamond_distance = self.distance(this_bot, closest_diamond, board)
+        if closest_diamond_distance > self.distance(this_bot, self.objects_button[0], board) + 3:
+            return self.moveToDiamondButton(this_bot, board)
+
+    # 6. Go to the nearest diamond if inventory space is more than equal to 2 and distance to diamond button  
         if closest_diamond and self.current_inventory_space >= 2:
             # print(f"Going to Diamond. Location : {closest_diamond.position}")
             return self.moveToObjective(this_bot, closest_diamond, board) 
             
-    # 6. Go to the nearest blue diamond that is within 2 moves, if the bot's inventory is not full  
+    # 7. Go to the nearest blue diamond that is within 2 moves, if the bot's inventory is not full  
         if closest_diamond.properties.points == 2:
             closest_diamond = self.getClosestBlueDiamond(this_bot, board)
         if closest_diamond and not self.isInventoryFull() and closest_diamond.properties.points == 1 and self.distance(this_bot, closest_diamond, board) <= 2:
             # print(f"Going to Diamond. Location : {closest_diamond.position}")
             return self.moveToObjective(this_bot, closest_diamond, board) 
 
-    # 7. If no diamonds are found, and the bot's inventory is not empty, then it will go to the base  
+    # 8. If no diamonds are found, and the bot's inventory is not empty, then it will go to the base  
         if(not self.isInventoryEmpty(this_bot)):
             # print("Emptying Inventory.")
             return self.moveToBase(this_bot, board)
         
-    # 8. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button  
+    # 9. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button  
         # print("Going to Diamond Button.")
         return self.moveToDiamondButton(this_bot, board)
