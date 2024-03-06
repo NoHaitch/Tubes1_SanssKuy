@@ -9,7 +9,7 @@ from random import randint
 # - Portal : TeleportGameObject
 # - Diamond Button : DiamondButtonGameObject 
 
-class BotGreedyPoints(BaseLogic):
+class Points(BaseLogic):
     def __init__(self):
         self.step = 0
 

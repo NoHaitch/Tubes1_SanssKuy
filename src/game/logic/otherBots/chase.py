@@ -10,7 +10,7 @@ import time
 # - Portal : TeleportGameObject
 # - Diamond Button : DiamondButtonGameObject 
 
-class BotChase(BaseLogic):
+class Chase(BaseLogic):
     def __init__(self):
         self.stepVariation = 0
         self.stepChaseEnemy = 0

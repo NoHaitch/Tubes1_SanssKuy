@@ -8,20 +8,20 @@ from game.bot_handler import BotHandler
 from game.util import *
 from game.logic.base import BaseLogic
 from game.logic.myBot import MyBot
-from game.logic.otherBots.random import RandomLogic
-from game.logic.otherBots.botGreedyPoints import BotGreedyPoints
-from game.logic.otherBots.botChase import BotChase
-from game.logic.otherBots.stayAtHome import StayAtHome
+from game.logic.otherBots.random import Random
+from game.logic.otherBots.points import Points
+from game.logic.otherBots.chase import Chase
+from game.logic.otherBots.stay import Stay
 
 init()
 BASE_URL = "http://localhost:3000/api"
 DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
-    "Random": RandomLogic,
-    "BotGreedyPoints" : BotGreedyPoints,
+    "Random": Random,
+    "BotGreedyPoints" : Points,
     "MyBot" : MyBot,
-    "BotChase" : BotChase,
-    "StayAtHome" : StayAtHome
+    "BotChase" : Chase,
+    "StayAtHome" : Stay
 }
 
 ###############################################################################
