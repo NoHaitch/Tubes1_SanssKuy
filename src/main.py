@@ -18,10 +18,10 @@ BASE_URL = "http://localhost:3000/api"
 DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": Random,
-    "BotGreedyPoints" : Points,
+    "Points" : Points,
     "MyBot" : MyBot,
-    "BotChase" : Chase,
-    "StayAtHome" : Stay
+    "Chase" : Chase,
+    "Stay" : Stay
 }
 
 ###############################################################################
