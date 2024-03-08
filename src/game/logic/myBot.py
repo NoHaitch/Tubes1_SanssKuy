@@ -281,8 +281,7 @@ class MyBot(BaseLogic):
     
     # 5. If closest diamond distance is further than button, go to button
         closest_diamond = self.getClosestDiamond(this_bot, board)
-        closest_diamond_distance = self.distance(this_bot, closest_diamond, board)
-        if closest_diamond_distance > self.distance(this_bot, self.objects_button[0], board) + 3:
+        if self.distance(self.base, closest_diamond, board) > self.distance(self.base, self.objects_button[0], board) + 3:
             return self.moveToDiamondButton(this_bot, board)
 
     # 6. Go to the nearest diamond if inventory space is more than equal to 2 and distance to diamond button  
