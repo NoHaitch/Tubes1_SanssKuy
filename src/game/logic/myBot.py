@@ -272,7 +272,7 @@ class MyBot(BaseLogic):
         if self.current_distance_to_base <= 2 and self.current_inventory_space <= (this_bot.properties.inventory_size // 2):
             return self.moveToBase(this_bot, board)
 
-    # 5. Go to the nearest diamond if inventory space is more than equal to 2 and distance to diamond button 
+    # 5. Go to the nearest diamond if inventory space is more than equal to 2
         closest_diamond = self.getClosestDiamond(this_bot, board) 
         if closest_diamond and self.current_inventory_space >= 2:
             # print(f"Going to Diamond. Location : {closest_diamond.position}")
