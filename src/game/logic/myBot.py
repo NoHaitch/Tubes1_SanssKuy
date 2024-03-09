@@ -258,7 +258,7 @@ class MyBot(BaseLogic):
             # print("Attack Close Enemy.")
             self.step_chase_enemy += 1
             return self.moveToClosestEnemy(this_bot, board) 
-        # logic to stop chasing attacking enemy after 2 tries
+        # logic to stop chasing attacking enemy after 3 tries
         elif self.step_chase_enemy == 5:
             self.step_chase_enemy = 0
         elif self.step_chase_enemy < 5:
