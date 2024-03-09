@@ -83,7 +83,7 @@
 
 - [Game Engine](https://github.com/haziqam/tubes1-IF2211-game-engine/releases/tag/v1.1.0)
 - [Bot Starter Pack](https://github.com/haziqam/tubes1-IF2211-bot-starter-pack/releases/tag/v1.0.1)
-- [Spesifikasi](https://docs.google.com/document/d/13cbmMVXviyu8eKQ6heqgDzt4JNNMeAZO/edit)
+- [Spesifikasi](https://github.com/NoHaitch/Tubes1_SanssKuy/blob/main/docs/Spesifikasi%20Tugas%20Besar%201%20IF2211%20Strategi%20Algoritma.pdf)
 - [Teams](https://docs.google.com/spreadsheets/d/1ZILn6qF6UQxNtX9gTAW3OLUATywvMxiH6ZWjcOHQIMk/edit#gid=0)
 - [Laporan](https://docs.google.com/document/d/1PFvT0fZ5A-Y0c4bGGskhrANSyCaK5hDHjAJZVX32QWw/edit#heading=h.ikd424rh8bpn)
 
@@ -98,13 +98,13 @@ A greedy Algorithm, in a short explanation, is taking the best move in the curre
   
 Our Bot uses a greedy algorithm mainly based on greedy by path. Currently, our Algorithm in priority are:   
 1. If the time left is less than the distance to the base, then the bot will go to the base    
-2. If the Enemy is within one move, then the bot will attack it, unless the enemy is in it's base    
+2. If the Enemy is within one move, then the bot will attack it, unless the enemy is in it's base     
 3. If the bot's inventory is full, it will go to the base to deposit the diamonds  
 4. If the bot's inventory is half full but the base is near, deposit the diamonds    
 5. Go to the nearest diamond if inventory space is more than equal to 2   
 6. Go to the nearest blue diamond that is within 2 moves, if the bot's inventory is not full  
 7. If no diamonds are found, and the bot's inventory is not empty, then it will go to the base  
-8. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button  
+8. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button diamond button  
 
 <!-- OPTIONAL LINK OR REFERENCE -->
 <!-- <p align="center">
@@ -154,12 +154,15 @@ This are the steps to run and use the bots.
    python main.py --logic <BotClassName> --email=<Email> --name=<BotName>  --password=<Password> --team etimo
 
    # example
-   python main.py --logic BotGreedyPath --email=test6@email.com --name=main --password=123456 --team etimo
+   python main.py --logic MyBot --email=example1@email.com --name=bot1 --password=123456 --team etimo
    ```
 
-  - `BotClassName` : class name of the bot you want, currently option are Random, BotGreedyPoints, BotGreedyPath, and BotChase  
+  - `BotClassName` : class name of the bot you want, currently option are [Random, Points, MyBot, Chase, Stay]
   - `Email` : email bust be in valid format (ex: your_email@example.com), each bot must have a unique email  
   - `BotName` : bot name must be unique and limited to 10 characters  
+    
+    Note: please ensure that there are no capital letter as it can lead to disappearance of name on the final score board 
+    
     &nbsp;
    
 4. Run multiple Bots
@@ -180,7 +183,7 @@ For further information please refer to [Get Started with Diamonds](https://docs
 <!-- Bots -->
 ## Features (Bots)
 
-### Greedy by Path (MAIN BOT)
+### MyBot is our main bot which uses a modified Greedy by Path algorithm
 #### Other bots made:
 - Greedy By Points
 - Chase Enemy
