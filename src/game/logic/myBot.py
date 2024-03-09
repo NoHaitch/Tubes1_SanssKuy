@@ -11,7 +11,6 @@ from random import randint
 
 class MyBot(BaseLogic):
     def __init__(self):
-        self.amount_move = 0
         self.step_variation : bool = False
         self.step_ignore_portal : int = 0
         self.step_chase_enemy : int = 0
