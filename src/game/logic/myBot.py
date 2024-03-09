@@ -157,7 +157,7 @@ class MyBot(BaseLogic):
                 return self.moveRight(this_bot, board)
 
         # Go To Portal if faster
-        if objective.type!="TeleportGameObject" and self.distance(this_bot, self.base, board) > self.distanceSelfUsingPortal(self.base):
+        if objective.type!="TeleportGameObject" and self.distanceWithoutPortal(this_bot, self.base, board) > self.distanceSelfUsingPortal(self.base):
             # print("PORTAL is closer!")
             return self.moveToObjective(this_bot, self.closest_portal_pair[0], board)
 
