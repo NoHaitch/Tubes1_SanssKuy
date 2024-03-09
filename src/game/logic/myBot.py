@@ -11,16 +11,15 @@ from random import randint
 
 class MyBot(BaseLogic):
     def __init__(self):
+        self.amount_move = 0
         self.step_variation : bool = False
         self.step_ignore_portal : int = 0
         self.step_chase_enemy : int = 0
         self.current_distance_to_base : int = 0
         self.current_inventory_space : int = None
+        self.distance_self_to_closest_portal : int = None
 
-        # self.self.sorted_portals[0] is the portal closest to player, while [1] is further
-        self.sorted_portals : list[GameObject] = []
-        # self.self.distance_self_to_portals[0] is the distant to the portal closest to player, while [1] is further
-        self.distance_self_to_portals : list[int] = []
+        self.closest_portal_pair : tuple[GameObject, GameObject] = None
         self.base : GameObject = None
 
         # Object Collection
@@ -70,21 +69,17 @@ class MyBot(BaseLogic):
     
     # ===== Get Portal ===== #
     def getPortals(self) -> list[GameObject]: return self.objects_portal
-    def getSortedPortals(self, this_bot: GameObject) -> list[GameObject]: 
-        # Sort portals based on distance to bot
+    def getClosestPortalPair(self, this_bot: GameObject) -> list[GameObject]: 
+        # Get all portals
         portals = self.getPortals()
+        
         if portals:
-            if self.distanceWithoutPortal(this_bot, portals[0]) < self.distanceWithoutPortal(this_bot, portals[1]):
-                return portals[0], portals[1]
-            else:
-                return portals[1], portals[0]
-        return None
-    def getSortedPortalsDistance(self, this_bot: GameObject, board: Board) -> list[int]:
-        if self.sorted_portals:
-            return (self.distanceWithoutPortal(this_bot, self.sorted_portals[0]), self.distanceWithoutPortal(this_bot, self.sorted_portals[1]))
-        else:
-            return None
-    
+            closest_portal = min(portals, key=lambda portal: self.distanceWithoutPortal(this_bot, portal))
+            for portal in portals:
+                if portal.properties.pair_id == closest_portal.properties.pair_id and closest_portal.id != portal.id:
+                    return closest_portal, portal
+        return None, None
+
     # ===== Get Button ===== #
     def getDiamondButton(self) -> GameObject: return self.objects_button[0]
 
@@ -121,21 +116,24 @@ class MyBot(BaseLogic):
     # ==================== Checks ==================== #
     def isInventoryFull(self) -> bool: return self.current_inventory_space == 0
     def isInventoryEmpty(self, this_bot: GameObject) -> bool: return self.current_inventory_space == this_bot.properties.inventory_size
-    def isBotHome(self, this_bot: GameObject) -> bool: return 
+    def isBotHome(self, bot: GameObject) -> bool: return bot.position == bot.properties.base 
 
     # ==================== Distance ===================== #
     def distance(self, objectFrom: GameObject, objectTo: GameObject, board: Board) -> int: 
         # TODO Ignore Portal Distance addition
         if objectTo.type =="TeleportGameObject": return self.distanceWithoutPortal(objectFrom, objectTo)
-        return min(self.distanceWithoutPortal(objectFrom, objectTo), self.distanceUsingPortal(objectFrom, objectTo, board))
+        return min(self.distanceWithoutPortal(objectFrom, objectTo), self.distanceUsingPortal(objectFrom, objectTo))
     def distanceWithoutPortal(self, objectFrom: GameObject, objectTo: GameObject) -> int: return abs(objectFrom.position.y - objectTo.position.y) + abs(objectFrom.position.x - objectTo.position.x)
-    def distanceUsingPortal(self, objectFrom: GameObject, objectTo: GameObject, board: Board) -> int:
-        return self.distanceWithoutPortal(objectFrom, self.sorted_portals[0]) + self.distanceWithoutPortal(self.sorted_portals[1], objectTo)
+    def distanceSelfUsingPortal(self, objectTo: GameObject) -> int:
+        return self.distance_self_to_closest_portal + self.distanceWithoutPortal(self.closest_portal_pair[1], objectTo)
+    def distanceUsingPortal(self, objectFrom:GameObject, objectTo: GameObject) -> int:
+        return self.distanceWithoutPortal(objectFrom, self.closest_portal_pair[0]) + self.distanceWithoutPortal(self.closest_portal_pair[1], objectTo)
     def distanceToClosestEnemy(self, this_bot: GameObject, board: Board) -> int: 
         if not self.closest_enemy:
             return None
         return self.distance(this_bot, self.closest_enemy, board)
     def distanceToBase(self, this_bot: GameObject, board: Board) -> int: return self.distance(this_bot, self.base, board)
+    def distanceToClosestPortal(self, this_bot: GameObject) -> int: return self.distanceWithoutPortal(this_bot, self.closest_portal_pair[0])
 
     # ==================== Movement ==================== #
     def moveRight(self) -> tuple[int, int] : return (1,0)
@@ -160,16 +158,15 @@ class MyBot(BaseLogic):
                 return self.moveRight(this_bot, board)
 
         # Go To Portal if faster
-        if objective.type!="TeleportGameObject" and self.distance(this_bot, self.base, board) > self.distanceUsingPortal(this_bot, self.base, board):
-            print("PORTAL is closer!")
-            return self.moveToObjective(this_bot, self.sorted_portals[0], board)
+        if objective.type!="TeleportGameObject" and self.distance(this_bot, self.base, board) > self.distanceSelfUsingPortal(self.base):
+            # print("PORTAL is closer!")
+            return self.moveToObjective(this_bot, self.closest_portal_pair[0], board)
 
         if objective.type!="TeleportGameObject":
-            # self.distance_self_to_portals[0] is the distance to the nearest portal
-            if self.distance_self_to_portals[0] == 1:
-                print("TRYING TO IGNORE PORTAL")
-                x_portal_diff:int  = this_bot.position.x - self.sorted_portals[0].position.x
-                y_portal_diff:int  = this_bot.position.y - self.sorted_portals[0].position.y
+            if self.distance_self_to_closest_portal == 1:
+                # print("TRYING TO IGNORE PORTAL")
+                x_portal_diff:int  = this_bot.position.x - self.closest_portal_pair[0].position.x
+                y_portal_diff:int  = this_bot.position.y - self.closest_portal_pair[0].position.y
 
                 # because portal is near make sure to avoid it
                 if x_diff < 0 and x_portal_diff == -1 : 
@@ -215,8 +212,8 @@ class MyBot(BaseLogic):
     
     # ===== Move to Object ===== #
     def moveToBase(self, this_bot: GameObject, board: Board) -> tuple[int, int]:
-        if self.distanceWithoutPortal(this_bot, self.base) > self.distanceUsingPortal(this_bot, self.base, board):
-            return self.moveToObjective(this_bot, self.sorted_portals[0], board)
+        if self.distanceWithoutPortal(this_bot, self.base) > self.distanceSelfUsingPortal(self.base):
+            return self.moveToObjective(this_bot, self.closest_portal_pair[0], board)
         return self.moveToObjective(this_bot, self.base, board)
     def moveToClosestEnemy(self, this_bot: GameObject, board: Board) -> tuple[int, int]: return self.moveToObjective(this_bot, self.getClosestEnemy(this_bot, board), board)
     def moveToDiamondButton(self, this_bot: GameObject, board: Board) -> tuple[int, int]: return self.moveToObjective(this_bot, self.getDiamondButton(), board)
@@ -230,44 +227,41 @@ class MyBot(BaseLogic):
     #   2. If the Enemy is within one move, then the bot will attack it, unless the enemy is in it's base     
     #   3. If the bot's inventory is full, it will go to the base to deposit the diamonds  
     #   4. If the bot's inventory is half full but the base is near, deposit the diamonds    
-    #   5. If closest diamond distance is further than button, go to button
-    #   6. Go to the nearest diamond if inventory space is more than equal to 2   
-    #   7. Go to the nearest blue diamond that is within 2 moves, if the bot's inventory is not full  
-    #   8. If no diamonds are found, and the bot's inventory is not empty, then it will go to the base  
-    #   9. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button  
+    #   5. Go to the nearest diamond if inventory space is more than equal to 2   
+    #   6. Go to the nearest blue diamond that is within 2 moves, if the bot's inventory is not full  
+    #   7. If no diamonds are found, and the bot's inventory is not empty, then it will go to the base  
+    #   8. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button  
     #
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     
     def next_move(self, this_bot: GameObject, board: Board ) -> tuple[int, int]:
     # BOT FUNCTION CALL BY ENGINE
-        # Update dynamic var
-        self.getGameObjects()
-        self.getDiamondsObject()
-        self.sorted_portals = self.getSortedPortals(this_bot)
-        self.distance_self_to_portals = self.getSortedPortalsDistance(this_bot, board)
-        self.current_distance_to_base = self.distanceToBase(this_bot, board)
-        self.current_inventory_space = self.getEmptyInventorySpace(this_bot)
+        self.getGameObjects(board)
+        self.getDiamondsObject(board)
         
-        # Update Static var
         if not self.base:
             self.base = self.getHomeBaseObject(this_bot)
-
+        
+        self.closest_portal_pair = self.getClosestPortalPair(this_bot)
+        self.distance_self_to_closest_portal = self.distanceToClosestPortal(this_bot)
+        self.current_distance_to_base = self.distanceToBase(this_bot, board)
+        self.current_inventory_space = self.getEmptyInventorySpace(this_bot)
 
     # 1. If the time left is less than the distance to the base, then the bot will go to the base    
-        if not self.isInventoryEmpty(this_bot) and self.getTimeRemaining(this_bot) - 2 <= self.current_distance_to_base and self.isBotHome(self.closest_enemy):
+        if not self.isInventoryEmpty(this_bot) and self.getTimeRemaining(this_bot) - 2 <= self.current_distance_to_base:
             # print("LOW TIME - GOING HOME")
             return self.moveToBase(this_bot, board)
 
     # 2. If the Enemy is within one move, then the bot will attack it, unless the enemy is in it's base    
         self.closest_enemy = self.getClosestEnemy(this_bot, board)
-        if self.distanceToClosestEnemy(this_bot, board) == 1 and self.step_chase_enemy:
+        if self.distanceToClosestEnemy(this_bot, board) == 1 and self.step_chase_enemy < 3 and not self.isBotHome(self.closest_enemy):
             # print("Attack Close Enemy.")
             self.step_chase_enemy += 1
             return self.moveToClosestEnemy(this_bot, board) 
-        # logic to stop chasing attacking enemy after 3 tries
-        elif self.step_chase_enemy == 4:
+        # logic to stop chasing attacking enemy after 2 tries
+        elif self.step_chase_enemy == 5:
             self.step_chase_enemy = 0
-        elif self.step_chase_enemy < 2:
+        elif self.step_chase_enemy < 5:
             self.step_chase_enemy += 1
 
     # 3. If the bot's inventory is full, it will go to the base to deposit the diamonds  
@@ -278,29 +272,26 @@ class MyBot(BaseLogic):
     # 4. If the bot's inventory is half full but the base is near, deposit the diamonds    
         if self.current_distance_to_base <= 2 and self.current_inventory_space <= (this_bot.properties.inventory_size // 2):
             return self.moveToBase(this_bot, board)
-    
-    # 5. If closest diamond distance is further than button, go to button
-        closest_diamond = self.getClosestDiamond(this_bot, board)
-        if self.distance(self.base, closest_diamond, board) > self.distance(self.base, self.objects_button[0], board) + 3:
-            return self.moveToDiamondButton(this_bot, board)
 
-    # 6. Go to the nearest diamond if inventory space is more than equal to 2 and distance to diamond button  
+    # 5. Go to the nearest diamond if inventory space is more than equal to 2 and distance to diamond button 
+        closest_diamond = self.getClosestDiamond(this_bot, board) 
         if closest_diamond and self.current_inventory_space >= 2:
             # print(f"Going to Diamond. Location : {closest_diamond.position}")
             return self.moveToObjective(this_bot, closest_diamond, board) 
             
-    # 7. Go to the nearest blue diamond that is within 2 moves, if the bot's inventory is not full  
+    # 6. Go to the nearest blue diamond that is within 2 moves, if the bot's inventory is not full  
         if closest_diamond.properties.points == 2:
             closest_diamond = self.getClosestBlueDiamond(this_bot, board)
         if closest_diamond and not self.isInventoryFull() and closest_diamond.properties.points == 1 and self.distance(this_bot, closest_diamond, board) <= 2:
             # print(f"Going to Diamond. Location : {closest_diamond.position}")
             return self.moveToObjective(this_bot, closest_diamond, board) 
 
-    # 8. If no diamonds are found, and the bot's inventory is not empty, then it will go to the base  
+    # 7. If no diamonds are found, and the bot's inventory is not empty, then it will go to the base  
         if(not self.isInventoryEmpty(this_bot)):
             # print("Emptying Inventory.")
             return self.moveToBase(this_bot, board)
         
-    # 9. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button  
+    # 8. If no diamonds are found and the bot's inventory is empty, then it will go to the diamond button  
         # print("Going to Diamond Button.")
+
         return self.moveToDiamondButton(this_bot, board)
