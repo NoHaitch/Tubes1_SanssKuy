@@ -21,8 +21,6 @@
 <br>
 <br>
 
-[![MIT License][license-shield]][license-url]
-
   </p>
 </div>
 
@@ -85,7 +83,7 @@
 - [Bot Starter Pack](https://github.com/haziqam/tubes1-IF2211-bot-starter-pack/releases/tag/v1.0.1)
 - [Spesifikasi](https://github.com/NoHaitch/Tubes1_SanssKuy/blob/main/docs/Spesifikasi%20Tugas%20Besar%201%20IF2211%20Strategi%20Algoritma.pdf)
 - [Teams](https://docs.google.com/spreadsheets/d/1ZILn6qF6UQxNtX9gTAW3OLUATywvMxiH6ZWjcOHQIMk/edit#gid=0)
-- [Laporan](https://docs.google.com/document/d/1PFvT0fZ5A-Y0c4bGGskhrANSyCaK5hDHjAJZVX32QWw/edit#heading=h.ikd424rh8bpn)
+- [Laporan](https://github.com/NoHaitch/Tubes1_SanssKuy/blob/main/docs/SanssKuy.pdf)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -224,5 +222,4 @@ The code in this project is licensed under MIT license.
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [issues-url]: https://github.com/NoHaitch/Tubes1_SanssKuy/issues
-[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
 [license-url]: https://github.com/NoHaitch/Tubes1_SanssKuy/blob/main/LICENSE
